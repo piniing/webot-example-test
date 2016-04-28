@@ -422,18 +422,18 @@ module.exports = exports = function(webot){
     // name 和 description 都不是必须的
     name: 'create_qrc',
     description: '创建二维码',
-    pattern: function(info) {
-      return info.text == 'xxx';
-    },
+    pattern: /^ewm(\d+)$/i,
     handler: function(info, next){
 
-      API.createQRCode(123, function (result) {
+      var num = Number(info.param[1]);
+
+      API.createQRCode(num, function (result) {
           result.then(function (url) {
               var reply = {
-                title: '亲，二维码已帮您生成！',
+                title: '亲，二维码[' +num+ ']已帮您生成！',
                 url: url,
                 picUrl: url,
-                description: '亲，二维码已帮您生成！',
+                description: '亲，二维码[' +num+ ']已帮您生成！',
               };
 
               return next(null, reply);
