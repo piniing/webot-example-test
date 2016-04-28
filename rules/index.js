@@ -431,7 +431,7 @@ module.exports = exports = function(webot){
           result.then(function (url) {
               var reply = {
                 title: '亲，二维码已帮您生成！',
-                url: 'http://www.db888.me',
+                url: url,
                 picUrl: url,
                 description: '亲，二维码已帮您生成！',
               };
@@ -441,19 +441,6 @@ module.exports = exports = function(webot){
               return next(null, 'catch');
           })
       });
-    }
-  });
-
-  webot.set({
-    // name 和 description 都不是必须的
-    name: 'EVENT_SCAN',
-    description: '场景二维码扫描事件',
-    pattern: function(info) {
-      //场景二维码扫描事件
-      return info.is('event') && info.param.event === 'SCAN';
-    },
-    handler: function(info){
-      return info.param.eventKey;
     }
   });
 
@@ -470,6 +457,18 @@ module.exports = exports = function(webot){
     }
   });
 
+  webot.set({
+    // name 和 description 都不是必须的
+    name: 'EVENT_SCAN',
+    description: '场景二维码扫描事件',
+    pattern: function(info) {
+      //场景二维码扫描事件
+      return info.is('event') && info.param.event === 'SCAN';
+    },
+    handler: function(info){
+      return info.param.eventKey;
+    }
+  });
 
   //所有消息都无法匹配时的fallback
   webot.set(/.*/, function(info){

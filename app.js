@@ -4,6 +4,15 @@ var webot = require('weixin-robot');
 var log = require('debug')('webot-example:log');
 var verbose = require('debug')('webot-example:verbose');
 
+// Webot.prototype.codeReplies = {
+//   '204': 'OK, got that.',
+//   '403': 'You have no permission to do this.',
+//   '404': 'Don\'t know what you are saying.',
+//   '500': 'Something is broken...'
+// };
+
+webot.codeReplies['404'] = null;
+
 // 启动服务
 var app = express();
 
