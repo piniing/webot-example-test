@@ -407,7 +407,7 @@ module.exports = exports = function(webot){
     pattern: /(?:kefu|客服)\s*(\d*)/,
     handler: function(info){
       
-      var openid = info.id;
+      var openid = info.uid;
 
       info.session.kefu_answer = openid;
 
