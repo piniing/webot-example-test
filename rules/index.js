@@ -46,6 +46,21 @@ module.exports = exports = function(webot){
     }
   });
 
+  webot.set({
+    // name 和 description 都不是必须的
+    name: 'hello help',
+    description: '获取使用帮助，发送 help',
+    pattern: function(info) {
+      //首次关注时,会收到subscribe event
+      return info.is('event') && info.param.event === 'SCAN';
+    },
+    handler: function(info){
+      console.log(info);
+      // 返回值如果是list，则回复图文消息列表
+      return 'SCAN';
+    }
+  });
+
   // 更简单地设置一条规则
   webot.set(/^more$/i, function(info){
     var reply = _.chain(webot.gets()).filter(function(rule){
