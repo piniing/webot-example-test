@@ -46,20 +46,6 @@ module.exports = exports = function(webot){
     }
   });
 
-  webot.set({
-    // name 和 description 都不是必须的
-    name: 'hello help',
-    description: '获取使用帮助，发送 help',
-    pattern: function(info) {
-      //首次关注时,会收到subscribe event
-      return info.is('event') && info.param.event === 'SCAN';
-    },
-    handler: function(info){
-      console.log(info);
-      // 返回值如果是list，则回复图文消息列表
-      return 'SCAN';
-    }
-  });
 
   // 更简单地设置一条规则
   webot.set(/^more$/i, function(info){
@@ -428,6 +414,59 @@ module.exports = exports = function(webot){
 
       info.wait('customer_service');
       return '等待客服接入，您可以先提问，如果要结束服务，请回复：退出';
+    }
+  });
+
+
+  webot.set({
+    // name 和 description 都不是必须的
+    name: 'create_qrc',
+    description: '创建二维码',
+    pattern: function(info) {
+      return info.text == 'xxx';
+    },
+    handler: function(info, next){
+
+      API.createQRCode(123, function (result) {
+          result.then(function (url) {
+              var reply = {
+                title: '亲，二维码已帮您生成！',
+                url: 'http://www.db888.me',
+                picUrl: url,
+                description: '亲，二维码已帮您生成！',
+              };
+
+              return next(null, reply);
+          }).catch(function () {
+              return next(null, 'catch');
+          })
+      });
+    }
+  });
+
+  webot.set({
+    // name 和 description 都不是必须的
+    name: 'EVENT_SCAN',
+    description: '场景二维码扫描事件',
+    pattern: function(info) {
+      //场景二维码扫描事件
+      return info.is('event') && info.param.event === 'SCAN';
+    },
+    handler: function(info){
+      return info.param.eventKey;
+    }
+  });
+
+  webot.set({
+    // name 和 description 都不是必须的
+    name: 'EVENT_SCAN_KEY',
+    description: '场景二维码扫描事件，特定值',
+    pattern: function(info) {
+      //场景二维码扫描事件
+      return info.is('event') && info.param.event === 'SCAN' && info.param.eventKey==10000;
+    },
+    handler: function(info){
+      return '一万';
     }
   });
 
