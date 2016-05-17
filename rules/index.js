@@ -338,18 +338,20 @@ module.exports = exports = function(webot){
       return info.is('image');
     },
     handler: function(info, next){
-      verbose('image url: %s', info.param.picUrl);
+      console.log('image url: %s', info.param.picUrl);
       try{
-        var shasum = crypto.createHash('md5');
+        // var shasum = crypto.createHash('md5');
 
-        var req = require('request')(info.param.picUrl);
+        // var req = require('request')(info.param.picUrl);
 
-        req.on('data', function(data) {
-          shasum.update(data);
-        });
-        req.on('end', function() {
-          return next(null, '你的图片hash: ' + shasum.digest('hex'));
-        });
+        // req.on('data', function(data) {
+        //   shasum.update(data);
+        // });
+        // req.on('end', function() {
+        //   return next(null, '你的图片hash: ' + shasum.digest('hex'));
+        // });
+        API.uploadMedia(info.param.picUrl);
+        return next(null, '你的图片hash: ' + info.param.picUrl);
       }catch(e){
         error('Failed hashing image: %s', e)
         return '生成图片hash失败: ' + e;

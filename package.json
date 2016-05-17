@@ -5,6 +5,7 @@
   "dependencies": {
     "debug": "~0.7.2",
     "express": "~3.0",
+    "gm": "^1.22.0",
     "js-yaml": "~2.0.3",
     "request": "~2.12",
     "underscore": "~1.4",
@@ -21,7 +22,7 @@
     "npm": ">=1.1.6"
   },
   "scripts": {
-    "start": "node app.js",
+    "start": "nodemon app.js",
     "test": "make test"
   },
   "keywords": [
