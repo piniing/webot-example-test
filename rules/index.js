@@ -527,7 +527,7 @@ module.exports = exports = function(webot){
 
           var openid = info.uid;
 
-          poster(openid).then(function (reply) {
+          poster.create(openid).then(function (reply) {
               console.log('reply: ', reply);
               return next(null, reply);
 
