@@ -12,6 +12,8 @@ var geo2loc = require('../lib/support').geo2loc;
 var package_info = require('../package.json');
 var API = require('../lib/wx_api');
 
+var createPoster = require('../lib/poster');
+
 /**
  * 初始化路由规则
  */
@@ -461,6 +463,19 @@ module.exports = exports = function(webot){
 
   webot.set({
     // name 和 description 都不是必须的
+    name: 'EVENT_SCAN_KEY2',
+    description: '场景二维码扫描事件，特定值999',
+    pattern: function(info) {
+      //场景二维码扫描事件
+      return info.is('event') && info.param.event === 'SCAN' && info.param.eventKey==999;
+    },
+    handler: function(info){
+      return '感谢您帮您的朋友放牛！你也要参加吗？请输入"放牛"或"fangniu"';
+    }
+  });
+
+  webot.set({
+    // name 和 description 都不是必须的
     name: 'EVENT_SCAN',
     description: '场景二维码扫描事件',
     pattern: function(info) {
@@ -472,7 +487,7 @@ module.exports = exports = function(webot){
     }
   });
 
-    webot.set('kefu', {
+    webot.set('meme', {
         description: '获取用户信息',
         pattern: /(?:my|me|user|我的|我的信息)\s*(\d*)/,
         handler: function(info, next){
@@ -497,6 +512,24 @@ module.exports = exports = function(webot){
           });
         }
     });
+
+    webot.set('poster', {
+        description: 'fangniu',
+        pattern: /(?:放牛|fangniu)\s*(\d*)/,
+        handler: function(info, next){
+
+          var openid = info.uid;
+
+          createPoster(openid).then(function (reply) {
+              console.log('reply: ', reply);
+              return next(null, reply);
+
+          }).catch(function () {
+              return next(null, '生成失败了！');
+          })
+        }
+    });
+    
 
   //所有消息都无法匹配时的fallback
   webot.set(/.*/, function(info){
