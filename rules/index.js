@@ -33,23 +33,22 @@ module.exports = exports = function(webot){
           API.kefu(poster.helpMessage(), info.uid);
       }
 
-      var reply = '让我们一起，到广阔的天地中，去聆听大自然的教诲！感谢您收听放牛娃。';
+      // var reply = '让我们一起，到广阔的天地中，去聆听大自然的教诲！感谢您收听放牛娃。';
 
-      // var reply = {
-      //   title: '感谢你收听webot机器人',
-      //   pic: 'https://raw.github.com/node-webot/webot-example/master/qrcode.jpg',
-      //   url: 'https://github.com/node-webot/webot-example',
-      //   description: [
-      //     '你可以试试以下指令:',
-      //       'game : 玩玩猜数字的游戏吧',
-      //       's+空格+关键词 : 我会帮你百度搜索喔',
-      //       's+空格+nde : 可以试试我的纠错能力',
-      //       '使用「位置」发送你的经纬度',
-      //       '重看本指令请回复help或问号',
-      //       '更多指令请回复more',
-      //       'PS: 点击下面的「查看全文」将跳转到我的github页'
-      //   ].join('\n')
-      // };
+      var reply = {
+        title: '让我们一起，到广阔的天地中，去聆听大自然的教诲！',
+        pic: 'http://webot.tjaja.com/subscribe.jpg',
+        url: 'http://webot.tjaja.com/subscribe.jpg',
+        description: [
+          '我是牛小二，感谢您收听放牛娃亲子圈',
+            '你可以试试以下指令:',
+            'game : 玩玩猜数字的游戏吧',
+            's+空格+关键词 : 我会帮你百度搜索喔',
+            's+空格+nde : 可以试试我的纠错能力',
+            '使用「位置」发送你的经纬度',
+            '更多指令请回复more'
+        ].join('\n')
+      };
       // 返回值如果是list，则回复图文消息列表
       return reply;
     }

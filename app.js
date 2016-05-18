@@ -1,5 +1,6 @@
 var express = require('express');
 var webot = require('weixin-robot');
+var path = require('path');
 
 var log = require('debug')('webot-example:log');
 var verbose = require('debug')('webot-example:verbose');
@@ -15,6 +16,9 @@ webot.codeReplies['404'] = null;
 
 // 启动服务
 var app = express();
+
+// 通常用于加载静态资源
+app.use('/static', express.static(path.resolve(__dirname, 'static')));
 
 // 实际使用时，这里填写你在微信公共平台后台填写的 token
 var wx_token = process.env.WX_TOKEN || 'keyboardcat123';
