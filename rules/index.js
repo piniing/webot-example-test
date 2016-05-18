@@ -472,6 +472,32 @@ module.exports = exports = function(webot){
     }
   });
 
+    webot.set('kefu', {
+        description: '获取用户信息',
+        pattern: /(?:my|me|user|我的|我的信息)\s*(\d*)/,
+        handler: function(info, next){
+
+          var openid = info.uid;
+
+          API.getUserInfo(openid, function (result) {
+              result.then(function (info) {
+                  console.log('userinfo: ', info);
+                  var reply = {
+                    title: 'hi,' + info.nickname,
+                    url: info.headimgurl,
+                    picUrl: info.headimgurl,
+                    description: JSON.stringify(info),
+                  };
+
+                  return next(null, reply);
+
+              }).catch(function () {
+                  return next(null, 'catch');
+              })
+          });
+        }
+    });
+
   //所有消息都无法匹配时的fallback
   webot.set(/.*/, function(info){
     // 利用 error log 收集听不懂的消息，以利于接下来完善规则
