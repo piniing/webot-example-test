@@ -37,16 +37,10 @@ module.exports = exports = function(webot){
 
       var reply = {
         title: '让我们一起，到广阔的天地中，去聆听大自然的教诲！',
-        pic: 'http://webot.tjaja.com/subscribe.jpg',
-        url: 'http://webot.tjaja.com/subscribe.jpg',
+        pic: 'http://webot.tjaja.com/static/subscribe.jpg',
+        url: 'http://webot.tjaja.com/static/subscribe.jpg',
         description: [
-          '我是牛小二，感谢您收听放牛娃亲子圈',
-            '你可以试试以下指令:',
-            'game : 玩玩猜数字的游戏吧',
-            's+空格+关键词 : 我会帮你百度搜索喔',
-            's+空格+nde : 可以试试我的纠错能力',
-            '使用「位置」发送你的经纬度',
-            '更多指令请回复more'
+          'hi，我是牛小二，感谢您收听放牛娃亲子圈，目前公众号正在开发中……',
         ].join('\n')
       };
       // 返回值如果是list，则回复图文消息列表
