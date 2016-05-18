@@ -12,7 +12,7 @@ var geo2loc = require('../lib/support').geo2loc;
 var package_info = require('../package.json');
 var API = require('../lib/wx_api');
 
-var createPoster = require('../lib/poster');
+var poster = require('../lib/poster');
 
 /**
  * 初始化路由规则
@@ -28,21 +28,28 @@ module.exports = exports = function(webot){
       return info.is('event') && info.param.event === 'subscribe' || reg_help.test(info.text);
     },
     handler: function(info){
-      var reply = {
-        title: '感谢你收听webot机器人',
-        pic: 'https://raw.github.com/node-webot/webot-example/master/qrcode.jpg',
-        url: 'https://github.com/node-webot/webot-example',
-        description: [
-          '你可以试试以下指令:',
-            'game : 玩玩猜数字的游戏吧',
-            's+空格+关键词 : 我会帮你百度搜索喔',
-            's+空格+nde : 可以试试我的纠错能力',
-            '使用「位置」发送你的经纬度',
-            '重看本指令请回复help或问号',
-            '更多指令请回复more',
-            'PS: 点击下面的「查看全文」将跳转到我的github页'
-        ].join('\n')
-      };
+
+      if(info.param.eventKey && info.param.eventKey=='qrscene_999') {
+          API.kefu(poster.helpMessage(), info.uid);
+      }
+
+      var reply = '让我们一起，到广阔的天地中，去聆听大自然的教诲！感谢您收听放牛娃。';
+
+      // var reply = {
+      //   title: '感谢你收听webot机器人',
+      //   pic: 'https://raw.github.com/node-webot/webot-example/master/qrcode.jpg',
+      //   url: 'https://github.com/node-webot/webot-example',
+      //   description: [
+      //     '你可以试试以下指令:',
+      //       'game : 玩玩猜数字的游戏吧',
+      //       's+空格+关键词 : 我会帮你百度搜索喔',
+      //       's+空格+nde : 可以试试我的纠错能力',
+      //       '使用「位置」发送你的经纬度',
+      //       '重看本指令请回复help或问号',
+      //       '更多指令请回复more',
+      //       'PS: 点击下面的「查看全文」将跳转到我的github页'
+      //   ].join('\n')
+      // };
       // 返回值如果是list，则回复图文消息列表
       return reply;
     }
@@ -470,7 +477,7 @@ module.exports = exports = function(webot){
       return info.is('event') && info.param.event === 'SCAN' && info.param.eventKey==999;
     },
     handler: function(info){
-      return '感谢您帮您的朋友放牛！你也要参加吗？请输入"放牛"或"fangniu"';
+      return poster.helpMessage();
     }
   });
 
@@ -513,14 +520,14 @@ module.exports = exports = function(webot){
         }
     });
 
-    webot.set('poster', {
+    webot.set('fangniu', {
         description: 'fangniu',
         pattern: /(?:放牛|fangniu)\s*(\d*)/,
         handler: function(info, next){
 
           var openid = info.uid;
 
-          createPoster(openid).then(function (reply) {
+          poster(openid).then(function (reply) {
               console.log('reply: ', reply);
               return next(null, reply);
 
