@@ -12,12 +12,19 @@ var geo2loc = require('../lib/support').geo2loc;
 var package_info = require('../package.json');
 var API = require('../lib/wx_api');
 
-var poster = require('../lib/poster');
+const Poster = require('./poster');
 
 /**
  * 初始化路由规则
  */
 module.exports = exports = function(webot){
+
+
+    //Poster.init(webot.posterId, function (poster) {
+    //    Poster.webotSet(webot, poster);
+    //});
+
+
   var reg_help = /^(help|\?)$/i
   webot.set({
     // name 和 description 都不是必须的
@@ -32,6 +39,38 @@ module.exports = exports = function(webot){
       if(info.param.eventKey && info.param.eventKey=='qrscene_999') {
           API.kefu(poster.helpMessage(), info.uid);
       }
+
+      /*
+      牛儿还在山坡吃草
+      放牛的却不知哪儿去了
+      不是他贪玩耍丢了牛
+      那放牛的孩子王二小
+      九月十六那天早上
+      敌人向一条山沟扫荡
+      山沟里掩护着后方机关
+      掩护着几千老乡
+      正在那十分危急的时候
+      敌人快要走到山口
+      昏头昏脑地迷失了方向
+      抓住了二小要他带路
+      二小他顺从地走在前面
+      把敌人带进我们的埋伏圈
+      四下里乒乒乓乓响起了枪炮
+      敌人才知道受了骗
+      敌人把二小挑在枪尖
+      摔死在大石头的上面
+      我们那十三岁的王二小
+      英勇地牺牲在山间
+      干部和老乡得到了安全
+      他却睡在冰冷的山间
+      他的脸上含着微笑
+      他的血染红蓝的天
+      秋风告别了这个村庄
+      他把这动人的故事传扬
+      每一个村庄都含着眼泪
+      歌唱着二小放牛郎
+      歌唱着二小放牛郎
+      */
 
       // var reply = '让我们一起，到广阔的天地中，去聆听大自然的教诲！感谢您收听放牛娃。';
 
@@ -198,7 +237,7 @@ module.exports = exports = function(webot){
       info.session.guess_answer = num;
 
       info.wait('wait_guess');
-      return '玩玩猜数字的游戏吧, 1~9,选一个';
+      return '玩玩猜数字的游戏吧, 1~9,选一个: ' + webot.posterId;
     }
   });
 
@@ -490,26 +529,21 @@ module.exports = exports = function(webot){
     webot.set('meme', {
         description: '获取用户信息',
         pattern: /(?:my|me|user|我的|我的信息)\s*(\d*)/,
-        handler: function(info, next){
+        handler: (info, next) => {
+            var openid = info.uid;
 
-          var openid = info.uid;
+            API.getUserInfo(openid).then((result) => {
+                // console.log('userinfo: ', result);
+                var reply = {
+                    title: 'hi,' + result.nickname,
+                    url: result.headimgurl,
+                    picUrl: result.headimgurl,
+                    description: JSON.stringify(result),
+                };
 
-          API.getUserInfo(openid, function (result) {
-              result.then(function (info) {
-                  console.log('userinfo: ', info);
-                  var reply = {
-                    title: 'hi,' + info.nickname,
-                    url: info.headimgurl,
-                    picUrl: info.headimgurl,
-                    description: JSON.stringify(info),
-                  };
+                return next(null, reply);
 
-                  return next(null, reply);
-
-              }).catch(function () {
-                  return next(null, 'catch');
-              })
-          });
+            }).catch(() => next(null, '抱歉，我们暂时无法处理您的请求！'));
         }
     });
 

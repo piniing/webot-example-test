@@ -22,7 +22,7 @@
     "npm": ">=1.1.6"
   },
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "DEBUG=webot-example:* nodemon app.js",
     "test": "make test"
   },
   "keywords": [
