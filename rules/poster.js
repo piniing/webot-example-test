@@ -195,7 +195,6 @@ const webotSet = function(webot, poster) {
                 };
 
                 return next(null, reply);
-
             }).catch(() => next(null, '抱歉，我们暂时无法处理您的请求！'));
         }
     });
@@ -206,18 +205,12 @@ const webotSet = function(webot, poster) {
         handler: function(info, next) {
 
             var openid = info.uid;
-
             poster.create(openid).then(function(reply) {
                 console.log('reply: ', reply);
                 return next(null, reply);
-
             }).catch((err) => {
-                console.log(`生成海报失败了，[${pid}] - [${openid}]: `, err);
                 return next(null, '抱歉，海报生成失败了，请再试一次！');
             });
-            // .catch(function() {
-            //     return next(null, '生成失败了！');
-            // })
         }
     });
 
