@@ -28,8 +28,14 @@ const webotSet = function(webot, poster) {
         },
         handler: function(info) {
 
-            if (info.param.eventKey && info.param.eventKey == 'qrscene_999') {
-                API.kefu(poster.helpMessage(), info.uid);
+
+            const RE_QRC = /^qrscene_(\d+)$/i;
+
+            info.param.eventKey = 'qrscene_222';
+
+            if (info.param.eventKey && RE_QRC.test(info.param.eventKey)) {
+                const qrcode = RE_QRC.exec(info.param.eventKey);
+                poster.lend(info.uid, qrcode[1]);
             }
 
             // var reply = '让我们一起，到广阔的天地中，去聆听大自然的教诲！感谢您收听放牛娃。';

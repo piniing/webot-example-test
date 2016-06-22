@@ -57,7 +57,7 @@ webot2.watch(app, {
 
 // 建立多个实例，并监听到不同 path ，
 var webot3 = new webot.Webot();
-Poster.init(4).then(function (poster) {
+Poster.init(1).then(function (poster) {
 
     Poster.webotSet(webot3, poster);
     // 启动机器人, 接管 web 服务请求
