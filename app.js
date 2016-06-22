@@ -31,7 +31,7 @@ var wx_token2 = process.env.WX_TOKEN_2 || 'weixinToken2';
 
 
 // 载入webot1的回复规则
-webot.posterId = 3;
+webot.posterId = 1;
 RulesIndex(webot);
 webot.watch(app, {
     token: wx_token,
@@ -59,7 +59,17 @@ webot2.watch(app, {
 var webot3 = new webot.Webot();
 Poster.init(1).then(function (poster) {
 
-    Poster.webotSet(webot3, poster);
+    Poster.webotSet(webot3, poster).then(r => {
+        //所有消息都无法匹配时的fallback
+        webot3.set(/.*/, function(info) {
+            // 利用 error log 收集听不懂的消息，以利于接下来完善规则
+            // 你也可以将这些 message 存入数据库
+            log('unhandled message: %s', info.text);
+            info.flag = true;
+            return '你发送了「' + info.text + '」,可惜我太笨了,听不懂. 发送: help 查看可用的指令';
+        });
+    });
+
     // 启动机器人, 接管 web 服务请求
     webot3.watch(app, {
         token: wx_token,

@@ -17,560 +17,424 @@ const Poster = require('./poster');
 /**
  * 初始化路由规则
  */
-module.exports = exports = function(webot){
-
-
-    //Poster.init(webot.posterId, function (poster) {
-    //    Poster.webotSet(webot, poster);
-    //});
-
-
-  var reg_help = /^(help|\?)$/i
-  webot.set({
-    // name 和 description 都不是必须的
-    name: 'hello help',
-    description: '获取使用帮助，发送 help',
-    pattern: function(info) {
-      //首次关注时,会收到subscribe event
-      return info.is('event') && info.param.event === 'subscribe' || reg_help.test(info.text);
-    },
-    handler: function(info){
-
-      if(info.param.eventKey && info.param.eventKey=='qrscene_999') {
-          API.kefu(poster.helpMessage(), info.uid);
-      }
-
-      /*
-      牛儿还在山坡吃草
-      放牛的却不知哪儿去了
-      不是他贪玩耍丢了牛
-      那放牛的孩子王二小
-      九月十六那天早上
-      敌人向一条山沟扫荡
-      山沟里掩护着后方机关
-      掩护着几千老乡
-      正在那十分危急的时候
-      敌人快要走到山口
-      昏头昏脑地迷失了方向
-      抓住了二小要他带路
-      二小他顺从地走在前面
-      把敌人带进我们的埋伏圈
-      四下里乒乒乓乓响起了枪炮
-      敌人才知道受了骗
-      敌人把二小挑在枪尖
-      摔死在大石头的上面
-      我们那十三岁的王二小
-      英勇地牺牲在山间
-      干部和老乡得到了安全
-      他却睡在冰冷的山间
-      他的脸上含着微笑
-      他的血染红蓝的天
-      秋风告别了这个村庄
-      他把这动人的故事传扬
-      每一个村庄都含着眼泪
-      歌唱着二小放牛郎
-      歌唱着二小放牛郎
-      */
-
-      // var reply = '让我们一起，到广阔的天地中，去聆听大自然的教诲！感谢您收听放牛娃。';
-
-      var reply = {
-        title: '让我们一起，到广阔的天地中，去聆听大自然的教诲！',
-        pic: 'http://webot.tjaja.com/static/subscribe.jpg',
-        url: 'http://webot.tjaja.com/static/subscribe.jpg',
-        description: [
-          'hi，我是牛小二，感谢您收听放牛娃亲子圈，目前公众号正在开发中……',
-        ].join('\n')
-      };
-      // 返回值如果是list，则回复图文消息列表
-      return reply;
-    }
-  });
-
-
-  // 更简单地设置一条规则
-  webot.set(/^more$/i, function(info){
-    var reply = _.chain(webot.gets()).filter(function(rule){
-      return rule.description;
-    }).map(function(rule){
-      //console.log(rule.name)
-      return '> ' + rule.description;
-    }).join('\n').value();
-
-    return ['我的主人还没教我太多东西,你可以考虑帮我加下.\n可用的指令:\n'+ reply,
-      '没有更多啦！当前可用指令：\n' + reply];
-  });
-
-  webot.set('who_are_you', {
-    description: '想知道我是谁吗? 发送: who?',
-    // pattern 既可以是函数，也可以是 regexp 或 字符串(模糊匹配)
-    pattern: /who|你是[谁\?]+/i,
-    // 回复handler也可以直接是字符串或数组，如果是数组则随机返回一个子元素
-    handler: ['我是神马机器人', '微信机器人']
-  });
-
-  // 正则匹配后的匹配组存在 info.query 中
-  webot.set('your_name', {
-    description: '自我介绍下吧, 发送: I am [enter_your_name]',
-    pattern: /^(?:my name is|i am|我(?:的名字)?(?:是|叫)?)\s*(.*)$/i,
-
-    // handler: function(info, action){
-    //   return '你好,' + info.param[1]
-    // }
-    // 或者更简单一点
-    handler: '你好,{1}'
-  });
-
-  // 简单的纯文本对话，可以用单独的 yaml 文件来定义
-  require('js-yaml');
-  webot.dialog(__dirname + '/dialog.yaml');
-
-  // 支持一次性加多个（方便后台数据库存储规则）
-  webot.set([{
-    name: 'morning',
-    description: '打个招呼吧, 发送: good morning',
-    pattern: /^(早上?好?|(good )?moring)[啊\!！\.。]*$/i,
-    handler: function(info){
-      var d = new Date();
-      var h = d.getHours();
-      if (h < 3) return '[嘘] 我这边还是深夜呢，别吵着大家了';
-      if (h < 5) return '这才几点钟啊，您就醒了？';
-      if (h < 7) return '早啊官人！您可起得真早呐~ 给你请安了！\n 今天想参加点什么活动呢？';
-      if (h < 9) return 'Morning, sir! 新的一天又开始了！您今天心情怎么样？';
-      if (h < 12) return '这都几点了，还早啊...';
-      if (h < 14) return '人家中午饭都吃过了，还早呐？';
-      if (h < 17) return '如此美好的下午，是很适合出门逛逛的';
-      if (h < 21) return '早，什么早？找碴的找？';
-      if (h >= 21) return '您还是早点睡吧...';
-    }
-  }, {
-    name: 'time',
-    description: '想知道几点吗? 发送: time',
-    pattern: /^(几点了|time)\??$/i,
-    handler: function(info) {
-      var d = new Date();
-      var h = d.getHours();
-      var t = '现在是服务器时间' + h + '点' + d.getMinutes() + '分';
-      if (h < 4 || h > 22) return t + '，夜深了，早点睡吧 [月亮]';
-      if (h < 6) return t + '，您还是再多睡会儿吧';
-      if (h < 9) return t + '，又是一个美好的清晨呢，今天准备去哪里玩呢？';
-      if (h < 12) return t + '，一日之计在于晨，今天要做的事情安排好了吗？';
-      if (h < 15) return t + '，午后的冬日是否特别动人？';
-      if (h < 19) return t + '，又是一个充满活力的下午！今天你的任务完成了吗？';
-      if (h <= 22) return t + '，这样一个美好的夜晚，有没有去看什么演出？';
-      return t;
-    }
-  }]);
-
-  // 等待下一次回复
-  webot.set('guess my sex', {
-    pattern: /是男.还是女.|你.*男的女的/,
-    handler: '你猜猜看呐',
-    replies: {
-      '/女|girl/i': '人家才不是女人呢',
-      '/男|boy/i': '是的，我就是翩翩公子一枚',
-      'both|不男不女': '你丫才不男不女呢',
-      '不猜': '好的，再见',
-      // 请谨慎使用通配符
-      '/.*/': function reguess(info) {
-        if (info.rewaitCount < 2) {
-          info.rewait();
-          return '你到底还猜不猜嘛！';
-        }
-        return '看来你真的不想猜啊';
-      },
-    }
-
-    // 也可以用一个函数搞定:
-    // replies: function(info){
-    //   return 'haha, I wont tell you'
-    // }
-
-    // 也可以是数组格式，每个元素为一条rule
-    // replies: [{
-    //   pattern: '/^g(irl)?\\??$/i',
-    //   handler: '猜错'
-    // },{
-    //   pattern: '/^b(oy)?\\??$/i',
-    //   handler: '猜对了'
-    // },{
-    //   pattern: 'both',
-    //   handler: '对你无语...'
-    // }]
-  });
-
-  // 定义一个 wait rule
-  webot.waitRule('wait_guess', function(info) {
-    var r = Number(info.text);
-
-    // 用户不想玩了...
-    if (isNaN(r)) {
-      info.resolve();
-      return null;
-    }
-
-    var num = info.session.guess_answer;
-
-    if (r === num) {
-      return '你真聪明!';
-    }
-
-    var rewaitCount = info.session.rewait_count || 0;
-    if (rewaitCount >= 2) {
-      return '怎么这样都猜不出来！答案是 ' + num + ' 啊！';
-    }
-
-    //重试
-    info.rewait();
-    return (r > num ? '大了': '小了') +',还有' + (2 - rewaitCount) + '次机会,再猜.';
-  });
-
-  webot.set('guess number', {
-    description: '发送: game , 玩玩猜数字的游戏吧',
-    pattern: /(?:game|玩?游戏)\s*(\d*)/,
-    handler: function(info){
-      //等待下一次回复
-      var num = Number(info.param[1]) || _.random(1,9);
-
-      verbose('answer is: ' + num);
-
-      info.session.guess_answer = num;
-
-      info.wait('wait_guess');
-      return '玩玩猜数字的游戏吧, 1~9,选一个: ' + webot.posterId;
-    }
-  });
-
-  webot.waitRule('wait_suggest_keyword', function(info, next){
-    if (!info.text) {
-      return next();
-    }
-
-    // 按照定义规则的 name 获取其他 handler
-    var rule_search = webot.get('search');
-
-    // 用户回复回来的消息
-    if (info.text.match(/^(好|要|y)$/i)) {
-      // 修改回复消息的匹配文本，传入搜索命令执行
-      info.param[0] = 's nodejs';
-      info.param[1] = 'nodejs';
-
-      // 执行某条规则
-      webot.exec(info, rule_search, next);
-      // 也可以调用 rule 的 exec 方法
-      // rule_search.exec(info, next);
-    } else {
-      info.param[1] = info.session.last_search_word;
-      // 或者直接调用 handler :
-      rule_search.handler(info, next);
-      // 甚至直接用命名好的 function name 来调用：
-      // do_search(info, next);
-    }
-    // remember to clean your session object.
-    delete info.session.last_search_word;
-  });
-  // 调用已有的action
-  webot.set('suggest keyword', {
-    description: '发送: s nde ,然后再回复Y或其他',
-    pattern: /^(?:搜索?|search|s\b)\s*(.+)/i,
-    handler: function(info){
-      var q = info.param[1];
-      if (q === 'nde') {
-        info.session.last_search_word = q;
-        info.wait('wait_suggest_keyword');
-        return '你输入了:' + q + '，似乎拼写错误。要我帮你更改为「nodejs」并搜索吗?';
-      }
-    }
-  });
-
-  function do_search(info, next){
-    // pattern的解析结果将放在param里
-    var q = info.param[1];
-    log('searching: ', q);
-    // 从某个地方搜索到数据...
-    return search(q , next);
-  }
-
-  // 可以通过回调返回结果
-  webot.set('search', {
-    description: '发送: s 关键词 ',
-    pattern: /^(?:搜索?|search|百度|s\b)\s*(.+)/i,
-    //handler也可以是异步的
-    handler: do_search
-  });
-
-
-  webot.waitRule('wait_timeout', function(info) {
-    if (new Date().getTime() - info.session.wait_begin > 5000) {
-      delete info.session.wait_begin;
-      return '你的操作超时了,请重新输入';
-    } else {
-      return '你在规定时限里面输入了: ' + info.text;
-    }
-  });
-
-  // 超时处理
-  webot.set('timeout', {
-    description: '输入timeout, 等待5秒后回复,会提示超时',
-    pattern: 'timeout',
-    handler: function(info) {
-      info.session.wait_begin = new Date().getTime();
-      info.wait('wait_timeout');
-      return '请等待5秒后回复';
-    }
-  });
-
-  /**
-   * Wait rules as lists
-   *
-   * 实现类似电话客服的自动应答流程
-   *
-   */
-  webot.set(/^ok webot$/i, function(info) {
-    info.wait('list');
-    return '可用指令：\n' +
-           '1 - 查看程序信息\n' +
-           '2 - 进入名字选择';
-  });
-  webot.waitRule('list', {
-    '1': 'webot ' + package_info.version,
-    '2': function(info) {
-      info.wait('list-2');
-      return '请选择人名:\n' +
-             '1 - Marry\n' +
-             '2 - Jane\n' +
-             '3 - 自定义'
-    }
-  });
-  webot.waitRule('list-2', {
-    '1': '你选择了 Marry',
-    '2': '你选择了 Jane',
-    '3': function(info) {
-      info.wait('list-2-3');
-      return '请输入你想要的人';
-    }
-  });
-  webot.waitRule('list-2-3', function(info) {
-    if (info.text) {
-      return '你输入了 ' + info.text;
-    }
-  });
-
-
-  //支持location消息 此examples使用的是高德地图的API
-  //http://restapi.amap.com/rgeocode/simple?resType=json&encode=utf-8&range=3000&roadnum=0&crossnum=0&poinum=0&retvalue=1&sid=7001&region=113.24%2C23.08
-  webot.set('check_location', {
-    description: '发送你的经纬度,我会查询你的位置',
-    pattern: function(info){
-      return info.is('location');
-    },
-    handler: function(info, next){
-      geo2loc(info.param, function(err, location, data) {
-        location = location || info.label;
-        next(null, location ? '你正在' + location : '我不知道你在什么地方。');
-      });
-    }
-  });
-
-  //图片
-  webot.set('check_image', {
-    description: '发送图片,我将返回其hash值',
-    pattern: function(info){
-      return info.is('image');
-    },
-    handler: function(info, next){
-      console.log('image url: %s', info.param.picUrl);
-      try{
-        // var shasum = crypto.createHash('md5');
-
-        // var req = require('request')(info.param.picUrl);
-
-        // req.on('data', function(data) {
-        //   shasum.update(data);
-        // });
-        // req.on('end', function() {
-        //   return next(null, '你的图片hash: ' + shasum.digest('hex'));
-        // });
-        API.uploadMedia(info.param.picUrl);
-        return next(null, '你的图片hash: ' + info.param.picUrl);
-      }catch(e){
-        error('Failed hashing image: %s', e)
-        return '生成图片hash失败: ' + e;
-      }
-    }
-  });
-
-  // 回复图文消息
-  webot.set('reply_news', {
-    description: '发送news,我将回复图文消息你',
-    pattern: /^news\s*(\d*)$/,
-    handler: function(info){
-      var reply = [
-        {title: '微信机器人', description: '微信机器人测试帐号：webot', pic: 'https://raw.github.com/node-webot/webot-example/master/qrcode.jpg', url: 'https://github.com/node-webot/webot-example'},
-        {title: '豆瓣同城微信帐号', description: '豆瓣同城微信帐号二维码：douban-event', pic: 'http://i.imgur.com/ijE19.jpg', url: 'https://github.com/node-webot/weixin-robot'},
-        {title: '图文消息3', description: '图文消息描述3', pic: 'https://raw.github.com/node-webot/webot-example/master/qrcode.jpg', url: 'http://www.baidu.com'}
-      ];
-      // 发送 "news 1" 时只回复一条图文消息
-      return Number(info.param[1]) == 1 ? reply[0] : reply;
-    }
-  });
-
-  // 可以指定图文消息的映射关系
-  webot.config.mapping = function(item, index, info){
-    //item.title = (index+1) + '> ' + item.title;
-    return item;
-  };
-
-
-  // 定义一个 wait rule
-  webot.waitRule('customer_service', function(info) {
-    var r = info.text;
-
-    // 用户不想玩了...
-    if (r==='退出') {
-      info.resolve();
-      return '感谢您的支持，再见！';
-    }
-
-    var openid = info.session.kefu_answer;
-
-    var rewaitCount = info.session.rewait_count || 0;
-    if (rewaitCount >= 10) {
-      return '结束对话！';
-    }
-
-    //重试
-    info.rewait();
-    API.kefu(openid + ' : ' + r);
-    return '嗯，收到！';
-    // return (r > num ? '大了': '小了') +',还有' + (2 - rewaitCount) + '次机会,再猜.';
-  });
-
-  webot.set('kefu', {
-    description: '发送客服消息',
-    pattern: /(?:kefu|客服)\s*(\d*)/,
-    handler: function(info){
-      
-      var openid = info.uid;
-
-      info.session.kefu_answer = openid;
-
-      info.wait('customer_service');
-      return '等待客服接入，您可以先提问，如果要结束服务，请回复：退出';
-    }
-  });
-
-
-  webot.set({
-    // name 和 description 都不是必须的
-    name: 'create_qrc',
-    description: '创建二维码',
-    pattern: /^ewm(\d+)$/i,
-    handler: function(info, next){
-
-      var num = Number(info.param[1]);
-
-      API.createQRCode(num, function (result) {
-          result.then(function (url) {
-              var reply = {
-                title: '亲，二维码[' +num+ ']已帮您生成！',
-                url: url,
-                picUrl: url,
-                description: '亲，二维码[' +num+ ']已帮您生成！',
-              };
-
-              return next(null, reply);
-          }).catch(function () {
-              return next(null, 'catch');
-          })
-      });
-    }
-  });
-
-  webot.set({
-    // name 和 description 都不是必须的
-    name: 'EVENT_SCAN_KEY',
-    description: '场景二维码扫描事件，特定值',
-    pattern: function(info) {
-      //场景二维码扫描事件
-      return info.is('event') && info.param.event === 'SCAN' && info.param.eventKey==10000;
-    },
-    handler: function(info){
-      return '一万';
-    }
-  });
-
-  webot.set({
-    // name 和 description 都不是必须的
-    name: 'EVENT_SCAN_KEY2',
-    description: '场景二维码扫描事件，特定值999',
-    pattern: function(info) {
-      //场景二维码扫描事件
-      return info.is('event') && info.param.event === 'SCAN' && info.param.eventKey==999;
-    },
-    handler: function(info){
-      return poster.helpMessage();
-    }
-  });
-
-  webot.set({
-    // name 和 description 都不是必须的
-    name: 'EVENT_SCAN',
-    description: '场景二维码扫描事件',
-    pattern: function(info) {
-      //场景二维码扫描事件
-      return info.is('event') && info.param.event === 'SCAN';
-    },
-    handler: function(info){
-      return info.param.eventKey;
-    }
-  });
-
-    webot.set('meme', {
-        description: '获取用户信息',
-        pattern: /(?:my|me|user|我的|我的信息)\s*(\d*)/,
-        handler: (info, next) => {
-            var openid = info.uid;
-
-            API.getUserInfo(openid).then((result) => {
-                // console.log('userinfo: ', result);
-                var reply = {
-                    title: 'hi,' + result.nickname,
-                    url: result.headimgurl,
-                    picUrl: result.headimgurl,
-                    description: JSON.stringify(result),
-                };
-
-                return next(null, reply);
-
-            }).catch(() => next(null, '抱歉，我们暂时无法处理您的请求！'));
-        }
+module.exports = exports = function(webot) {
+
+    Poster.init(webot.posterId).then(poster => {
+
+        Poster.webotSet(webot, poster).then(r => {
+
+            var reg_help = /^(help|\?)$/i
+            webot.set({
+                // name 和 description 都不是必须的
+                name: 'hello help',
+                description: '获取使用帮助，发送 help',
+                pattern: function(info) {
+                    //首次关注时,会收到subscribe event
+                    return info.is('event') && info.param.event === 'subscribe' || reg_help.test(info.text);
+                },
+                handler: function(info) {
+
+                    // 牛儿还在山坡吃草
+                    // 放牛的却不知哪儿去了
+                    // 不是他贪玩耍丢了牛
+                    // 那放牛的孩子王二小
+                    // 九月十六那天早上
+                    // 敌人向一条山沟扫荡
+                    // 山沟里掩护着后方机关
+                    // 掩护着几千老乡
+                    // 正在那十分危急的时候
+                    // 敌人快要走到山口
+                    // 昏头昏脑地迷失了方向
+                    // 抓住了二小要他带路
+                    // 二小他顺从地走在前面
+                    // 把敌人带进我们的埋伏圈
+                    // 四下里乒乒乓乓响起了枪炮
+                    // 敌人才知道受了骗
+                    // 敌人把二小挑在枪尖
+                    // 摔死在大石头的上面
+                    // 我们那十三岁的王二小
+                    // 英勇地牺牲在山间
+                    // 干部和老乡得到了安全
+                    // 他却睡在冰冷的山间
+                    // 他的脸上含着微笑
+                    // 他的血染红蓝的天
+                    // 秋风告别了这个村庄
+                    // 他把这动人的故事传扬
+                    // 每一个村庄都含着眼泪
+                    // 歌唱着二小放牛郎
+                    // 歌唱着二小放牛郎
+
+
+                    // var reply = '让我们一起，到广阔的天地中，去聆听大自然的教诲！感谢您收听放牛娃。';
+
+                    var reply = {
+                        title: '让我们一起，到广阔的天地中，去聆听大自然的教诲！',
+                        pic: 'http://webot.tjaja.com/static/subscribe.jpg',
+                        url: 'http://webot.tjaja.com/static/subscribe.jpg',
+                        description: [
+                            'hi，我是牛小二，感谢您收听放牛娃亲子圈，目前公众号正在开发中……',
+                        ].join('\n')
+                    };
+                    // 返回值如果是list，则回复图文消息列表
+                    return reply;
+                }
+            });
+
+            // 更简单地设置一条规则
+            webot.set(/^more$/i, function(info) {
+                var reply = _.chain(webot.gets()).filter(function(rule) {
+                    return rule.description;
+                }).map(function(rule) {
+                    //console.log(rule.name)
+                    return '> ' + rule.description;
+                }).join('\n').value();
+
+                return ['我的主人还没教我太多东西,你可以考虑帮我加下.\n可用的指令:\n' + reply,
+                    '没有更多啦！当前可用指令：\n' + reply
+                ];
+            });
+
+            webot.set('who_are_you', {
+                description: '想知道我是谁吗? 发送: who?',
+                // pattern 既可以是函数，也可以是 regexp 或 字符串(模糊匹配)
+                pattern: /who|你是[谁\?]+/i,
+                // 回复handler也可以直接是字符串或数组，如果是数组则随机返回一个子元素
+                handler: ['我是神马机器人', '微信机器人']
+            });
+
+            // 正则匹配后的匹配组存在 info.query 中
+            webot.set('your_name', {
+                description: '自我介绍下吧, 发送: I am [enter_your_name]',
+                pattern: /^(?:my name is|i am|我(?:的名字)?(?:是|叫)?)\s*(.*)$/i,
+
+                // handler: function(info, action){
+                //   return '你好,' + info.param[1]
+                // }
+                // 或者更简单一点
+                handler: '你好,{1}'
+            });
+
+            // 简单的纯文本对话，可以用单独的 yaml 文件来定义
+            require('js-yaml');
+            webot.dialog(__dirname + '/dialog.yaml');
+
+            // 支持一次性加多个（方便后台数据库存储规则）
+            webot.set([{
+                name: 'morning',
+                description: '打个招呼吧, 发送: good morning',
+                pattern: /^(早上?好?|(good )?moring)[啊\!！\.。]*$/i,
+                handler: function(info) {
+                    var d = new Date();
+                    var h = d.getHours();
+                    if (h < 3) return '[嘘] 我这边还是深夜呢，别吵着大家了';
+                    if (h < 5) return '这才几点钟啊，您就醒了？';
+                    if (h < 7) return '早啊官人！您可起得真早呐~ 给你请安了！\n 今天想参加点什么活动呢？';
+                    if (h < 9) return 'Morning, sir! 新的一天又开始了！您今天心情怎么样？';
+                    if (h < 12) return '这都几点了，还早啊...';
+                    if (h < 14) return '人家中午饭都吃过了，还早呐？';
+                    if (h < 17) return '如此美好的下午，是很适合出门逛逛的';
+                    if (h < 21) return '早，什么早？找碴的找？';
+                    if (h >= 21) return '您还是早点睡吧...';
+                }
+            }, {
+                name: 'time',
+                description: '想知道几点吗? 发送: time',
+                pattern: /^(几点了|time)\??$/i,
+                handler: function(info) {
+                    var d = new Date();
+                    var h = d.getHours();
+                    var t = '现在是服务器时间' + h + '点' + d.getMinutes() + '分';
+                    if (h < 4 || h > 22) return t + '，夜深了，早点睡吧 [月亮]';
+                    if (h < 6) return t + '，您还是再多睡会儿吧';
+                    if (h < 9) return t + '，又是一个美好的清晨呢，今天准备去哪里玩呢？';
+                    if (h < 12) return t + '，一日之计在于晨，今天要做的事情安排好了吗？';
+                    if (h < 15) return t + '，午后的冬日是否特别动人？';
+                    if (h < 19) return t + '，又是一个充满活力的下午！今天你的任务完成了吗？';
+                    if (h <= 22) return t + '，这样一个美好的夜晚，有没有去看什么演出？';
+                    return t;
+                }
+            }]);
+
+            // 等待下一次回复
+            webot.set('guess my sex', {
+                pattern: /是男.还是女.|你.*男的女的/,
+                handler: '你猜猜看呐',
+                replies: {
+                    '/女|girl/i': '人家才不是女人呢',
+                    '/男|boy/i': '是的，我就是翩翩公子一枚',
+                    'both|不男不女': '你丫才不男不女呢',
+                    '不猜': '好的，再见',
+                    // 请谨慎使用通配符
+                    '/.*/': function reguess(info) {
+                        if (info.rewaitCount < 2) {
+                            info.rewait();
+                            return '你到底还猜不猜嘛！';
+                        }
+                        return '看来你真的不想猜啊';
+                    },
+                }
+
+                // 也可以用一个函数搞定:
+                // replies: function(info){
+                //   return 'haha, I wont tell you'
+                // }
+
+                // 也可以是数组格式，每个元素为一条rule
+                // replies: [{
+                //   pattern: '/^g(irl)?\\??$/i',
+                //   handler: '猜错'
+                // },{
+                //   pattern: '/^b(oy)?\\??$/i',
+                //   handler: '猜对了'
+                // },{
+                //   pattern: 'both',
+                //   handler: '对你无语...'
+                // }]
+            });
+
+            // 定义一个 wait rule
+            webot.waitRule('wait_guess', function(info) {
+                var r = Number(info.text);
+
+                // 用户不想玩了...
+                if (isNaN(r)) {
+                    info.resolve();
+                    return null;
+                }
+
+                var num = info.session.guess_answer;
+
+                if (r === num) {
+                    return '你真聪明!';
+                }
+
+                var rewaitCount = info.session.rewait_count || 0;
+                if (rewaitCount >= 2) {
+                    return '怎么这样都猜不出来！答案是 ' + num + ' 啊！';
+                }
+
+                //重试
+                info.rewait();
+                return (r > num ? '大了' : '小了') + ',还有' + (2 - rewaitCount) + '次机会,再猜.';
+            });
+
+            webot.set('guess number', {
+                description: '发送: game , 玩玩猜数字的游戏吧',
+                pattern: /(?:game|玩?游戏)\s*(\d*)/,
+                handler: function(info) {
+                    //等待下一次回复
+                    var num = Number(info.param[1]) || _.random(1, 9);
+
+                    verbose('answer is: ' + num);
+
+                    info.session.guess_answer = num;
+
+                    info.wait('wait_guess');
+                    return '玩玩猜数字的游戏吧, 1~9,选一个: ' + webot.posterId;
+                }
+            });
+
+            webot.waitRule('wait_suggest_keyword', function(info, next) {
+                if (!info.text) {
+                    return next();
+                }
+
+                // 按照定义规则的 name 获取其他 handler
+                var rule_search = webot.get('search');
+
+                // 用户回复回来的消息
+                if (info.text.match(/^(好|要|y)$/i)) {
+                    // 修改回复消息的匹配文本，传入搜索命令执行
+                    info.param[0] = 's nodejs';
+                    info.param[1] = 'nodejs';
+
+                    // 执行某条规则
+                    webot.exec(info, rule_search, next);
+                    // 也可以调用 rule 的 exec 方法
+                    // rule_search.exec(info, next);
+                } else {
+                    info.param[1] = info.session.last_search_word;
+                    // 或者直接调用 handler :
+                    rule_search.handler(info, next);
+                    // 甚至直接用命名好的 function name 来调用：
+                    // do_search(info, next);
+                }
+                // remember to clean your session object.
+                delete info.session.last_search_word;
+            });
+            // 调用已有的action
+            webot.set('suggest keyword', {
+                description: '发送: s nde ,然后再回复Y或其他',
+                pattern: /^(?:搜索?|search|s\b)\s*(.+)/i,
+                handler: function(info) {
+                    var q = info.param[1];
+                    if (q === 'nde') {
+                        info.session.last_search_word = q;
+                        info.wait('wait_suggest_keyword');
+                        return '你输入了:' + q + '，似乎拼写错误。要我帮你更改为「nodejs」并搜索吗?';
+                    }
+                }
+            });
+
+            function do_search(info, next) {
+                // pattern的解析结果将放在param里
+                var q = info.param[1];
+                log('searching: ', q);
+                // 从某个地方搜索到数据...
+                return search(q, next);
+            }
+
+            // 可以通过回调返回结果
+            webot.set('search', {
+                description: '发送: s 关键词 ',
+                pattern: /^(?:搜索?|search|百度|s\b)\s*(.+)/i,
+                //handler也可以是异步的
+                handler: do_search
+            });
+
+
+            webot.waitRule('wait_timeout', function(info) {
+                if (new Date().getTime() - info.session.wait_begin > 5000) {
+                    delete info.session.wait_begin;
+                    return '你的操作超时了,请重新输入';
+                } else {
+                    return '你在规定时限里面输入了: ' + info.text;
+                }
+            });
+
+            // 超时处理
+            webot.set('timeout', {
+                description: '输入timeout, 等待5秒后回复,会提示超时',
+                pattern: 'timeout',
+                handler: function(info) {
+                    info.session.wait_begin = new Date().getTime();
+                    info.wait('wait_timeout');
+                    return '请等待5秒后回复';
+                }
+            });
+
+            /**
+             * Wait rules as lists
+             *
+             * 实现类似电话客服的自动应答流程
+             *
+             */
+            webot.set(/^ok webot$/i, function(info) {
+                info.wait('list');
+                return '可用指令：\n' +
+                    '1 - 查看程序信息\n' +
+                    '2 - 进入名字选择';
+            });
+            webot.waitRule('list', {
+                '1': 'webot ' + package_info.version,
+                '2': function(info) {
+                    info.wait('list-2');
+                    return '请选择人名:\n' +
+                        '1 - Marry\n' +
+                        '2 - Jane\n' +
+                        '3 - 自定义'
+                }
+            });
+            webot.waitRule('list-2', {
+                '1': '你选择了 Marry',
+                '2': '你选择了 Jane',
+                '3': function(info) {
+                    info.wait('list-2-3');
+                    return '请输入你想要的人';
+                }
+            });
+            webot.waitRule('list-2-3', function(info) {
+                if (info.text) {
+                    return '你输入了 ' + info.text;
+                }
+            });
+
+
+            //支持location消息 此examples使用的是高德地图的API
+            //http://restapi.amap.com/rgeocode/simple?resType=json&encode=utf-8&range=3000&roadnum=0&crossnum=0&poinum=0&retvalue=1&sid=7001&region=113.24%2C23.08
+            webot.set('check_location', {
+                description: '发送你的经纬度,我会查询你的位置',
+                pattern: function(info) {
+                    return info.is('location');
+                },
+                handler: function(info, next) {
+                    geo2loc(info.param, function(err, location, data) {
+                        location = location || info.label;
+                        next(null, location ? '你正在' + location : '我不知道你在什么地方。');
+                    });
+                }
+            });
+
+            //图片
+            webot.set('check_image', {
+                description: '发送图片,我将返回其hash值',
+                pattern: function(info) {
+                    return info.is('image');
+                },
+                handler: function(info, next) {
+                    console.log('image url: %s', info.param.picUrl);
+                    try {
+                        // var shasum = crypto.createHash('md5');
+
+                        // var req = require('request')(info.param.picUrl);
+
+                        // req.on('data', function(data) {
+                        //   shasum.update(data);
+                        // });
+                        // req.on('end', function() {
+                        //   return next(null, '你的图片hash: ' + shasum.digest('hex'));
+                        // });
+                        API.uploadMedia(info.param.picUrl);
+                        return next(null, '你的图片hash: ' + info.param.picUrl);
+                    } catch (e) {
+                        error('Failed hashing image: %s', e)
+                        return '生成图片hash失败: ' + e;
+                    }
+                }
+            });
+
+            // 回复图文消息
+            webot.set('reply_news', {
+                description: '发送news,我将回复图文消息你',
+                pattern: /^news\s*(\d*)$/,
+                handler: function(info) {
+                    var reply = [{
+                        title: '微信机器人',
+                        description: '微信机器人测试帐号：webot',
+                        pic: 'https://raw.github.com/node-webot/webot-example/master/qrcode.jpg',
+                        url: 'https://github.com/node-webot/webot-example'
+                    }, {
+                        title: '豆瓣同城微信帐号',
+                        description: '豆瓣同城微信帐号二维码：douban-event',
+                        pic: 'http://i.imgur.com/ijE19.jpg',
+                        url: 'https://github.com/node-webot/weixin-robot'
+                    }, {
+                        title: '图文消息3',
+                        description: '图文消息描述3',
+                        pic: 'https://raw.github.com/node-webot/webot-example/master/qrcode.jpg',
+                        url: 'http://www.baidu.com'
+                    }];
+                    // 发送 "news 1" 时只回复一条图文消息
+                    return Number(info.param[1]) == 1 ? reply[0] : reply;
+                }
+            });
+
+            // 可以指定图文消息的映射关系
+            webot.config.mapping = function(item, index, info) {
+                //item.title = (index+1) + '> ' + item.title;
+                return item;
+            };
+
+            //所有消息都无法匹配时的fallback
+            webot.set(/.*/, function(info) {
+                // 利用 error log 收集听不懂的消息，以利于接下来完善规则
+                // 你也可以将这些 message 存入数据库
+                log('unhandled message: %s', info.text);
+                info.flag = true;
+                return '你发送了「' + info.text + '」,可惜我太笨了,听不懂. 发送: help 查看可用的指令';
+            });
+
+        });
     });
 
-    webot.set('fangniu', {
-        description: 'fangniu',
-        pattern: /(?:放牛|fangniu)\s*(\d*)/,
-        handler: function(info, next){
-
-          var openid = info.uid;
-
-          poster.create(openid).then(function (reply) {
-              console.log('reply: ', reply);
-              return next(null, reply);
-
-          }).catch(function () {
-              return next(null, '生成失败了！');
-          })
-        }
-    });
-    
-
-  //所有消息都无法匹配时的fallback
-  webot.set(/.*/, function(info){
-    // 利用 error log 收集听不懂的消息，以利于接下来完善规则
-    // 你也可以将这些 message 存入数据库
-    log('unhandled message: %s', info.text);
-    info.flag = true;
-    return '你发送了「' + info.text + '」,可惜我太笨了,听不懂. 发送: help 查看可用的指令';
-  });
 };
