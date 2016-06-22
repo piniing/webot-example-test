@@ -37,7 +37,9 @@ const webotSet = function(webot, poster) {
 
                 if (info.param.eventKey && RE_QRC.test(info.param.eventKey)) {
                     const qrcode = RE_QRC.exec(info.param.eventKey);
-                    poster.lend(info.uid, qrcode[1]);
+                    
+                    //发送客服消息给扫码的用户
+                    API.kefu(poster.lend(info.uid, qrcode[1]), info.uid);
                 }
 
                 // var reply = '让我们一起，到广阔的天地中，去聆听大自然的教诲！感谢您收听放牛娃。';
@@ -76,7 +78,7 @@ const webotSet = function(webot, poster) {
         //             pic: 'https://raw.github.com/node-webot/webot-example/master/qrcode.jpg',
         //             url: 'http://www.baidu.com'
         //         }];
-                
+
         //         return reply;
         //     }
         // });
@@ -208,7 +210,8 @@ const webotSet = function(webot, poster) {
                 return info.is('event') && info.param.event === 'SCAN';
             },
             handler: function(info) {
-                return info.param.eventKey;
+                //TODO::返回发送
+                return poster.lend(info.uid, info.param.eventKey);
             }
         });
 
