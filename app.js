@@ -6,7 +6,7 @@ var log = require('debug')('webot-example:log');
 var verbose = require('debug')('webot-example:verbose');
 
 var Poster = require('./rules/poster');
-var RulesIndex = require('./rules/index');
+// var RulesIndex = require('./rules/index');
 
 // Webot.prototype.codeReplies = {
 //   '204': 'OK, got that.',
@@ -30,28 +30,28 @@ var wx_token = process.env.WX_TOKEN || 'keyboardcat123';
 var wx_token2 = process.env.WX_TOKEN_2 || 'weixinToken2';
 
 
-// 载入webot1的回复规则
-webot.posterId = 1;
-RulesIndex(webot);
-webot.watch(app, {
-    token: wx_token,
-    path: '/wechat'
-});
+// // 载入webot1的回复规则
+// webot.posterId = 1;
+// RulesIndex(webot);
+// webot.watch(app, {
+//     token: wx_token,
+//     path: '/wechat'
+// });
 
 
 
 
-// 建立多个实例，并监听到不同 path ，
-var webot2 = new webot.Webot();
-// 为webot2也指定规则
-webot2.set('hello', 'hi.');
-// 若省略 path 参数，会监听到根目录
-// webot.watch(app, { token: wx_token });
-// 后面指定的 path 不可为前面实例的子目录
-webot2.watch(app, {
-    token: wx_token2,
-    path: '/wechat_2'
-});
+// // 建立多个实例，并监听到不同 path ，
+// var webot2 = new webot.Webot();
+// // 为webot2也指定规则
+// webot2.set('hello', 'hi.');
+// // 若省略 path 参数，会监听到根目录
+// // webot.watch(app, { token: wx_token });
+// // 后面指定的 path 不可为前面实例的子目录
+// webot2.watch(app, {
+//     token: wx_token2,
+//     path: '/wechat_2'
+// });
 
 
 

@@ -57,6 +57,10 @@ const webotSet = function(webot, poster) {
             }
         });
 
+        // 简单的纯文本对话，可以用单独的 yaml 文件来定义
+        require('js-yaml');
+        webot.dialog(__dirname + '/dialog.yaml');
+
         webot.set({
                 // name 和 description 都不是必须的
                 name: 'voice',
@@ -67,7 +71,7 @@ const webotSet = function(webot, poster) {
                 },
                 handler: function(info, next) {
                     if(info.param.recognition){
-
+                        return next(null, info.param.recognition);
                     }else{
                         return next(null, "哟，别害羞嘛！想说什么大声说出来！");
                     }
@@ -250,6 +254,35 @@ const webotSet = function(webot, poster) {
 
                     return next(null, reply);
                 }).catch(() => next(null, '抱歉，我们暂时无法处理您的请求！'));
+            }
+        });
+
+        //图片
+        webot.set('check_image', {
+            description: '发送图片,我将返回其hash值',
+            pattern: function(info) {
+                return info.is('image');
+            },
+            handler: function(info, next) {
+                console.log('image url: %s', info.param.picUrl);
+                try {
+                    // var shasum = crypto.createHash('md5');
+
+                    // var req = require('request')(info.param.picUrl);
+
+                    // req.on('data', function(data) {
+                    //   shasum.update(data);
+                    // });
+                    // req.on('end', function() {
+                    //   return next(null, '你的图片hash: ' + shasum.digest('hex'));
+                    // });
+                    
+                    // API.uploadMedia(info.param.picUrl);
+                    return next(null, '你的图片hash: ' + info.param.picUrl);
+                } catch (e) {
+                    error('Failed hashing image: %s', e)
+                    return '生成图片hash失败: ' + e;
+                }
             }
         });
 
