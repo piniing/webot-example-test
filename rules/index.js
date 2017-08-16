@@ -80,6 +80,7 @@ module.exports = exports = function(webot) {
                 }
             });
 
+
             // 更简单地设置一条规则
             webot.set(/^more$/i, function(info) {
                 var reply = _.chain(webot.gets()).filter(function(rule) {

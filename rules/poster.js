@@ -57,6 +57,23 @@ const webotSet = function(webot, poster) {
             }
         });
 
+        webot.set({
+                // name 和 description 都不是必须的
+                name: 'voice',
+                description: '语音识别',
+                pattern: function(info) {
+                    //首次关注时,会收到subscribe event
+                    return info.is('voice');
+                },
+                handler: function(info, next) {
+                    if(info.param.recognition){
+
+                    }else{
+                        return next(null, "哟，别害羞嘛！想说什么大声说出来！");
+                    }
+                }
+            });
+
         // // 测试替换hi
         // webot.set('replace_hi', {
         //     description: '测试替换hi',
