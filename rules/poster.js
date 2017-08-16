@@ -75,7 +75,7 @@ const webotSet = function(webot, poster) {
                         API.semantic(info.uid, info.param.recognition).then(result => {
                             return next(null, JSON.stringify(result));
                         }).catch(err => {
-                            return next(null, JSON.stringify(err));
+                            return next(null, 'Error: '+JSON.stringify(err));
                         })
                         
                     }else{
