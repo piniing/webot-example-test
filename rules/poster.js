@@ -19,7 +19,7 @@ const webotSet = function(webot, poster) {
 
     return new Promise((resolve, reject) => {
         
-        var reg_help = /^(help|\?)$/i
+        var reg_help = /^(help|\?|？)$/i
         webot.set({
             // name 和 description 都不是必须的
             name: 'hello help',
@@ -46,8 +46,8 @@ const webotSet = function(webot, poster) {
 
                 var reply = {
                     title: '让我们一起，到广阔的天地中，去聆听大自然的教诲！',
-                    pic: 'http://webot.tjaja.com/static/subscribe.jpg',
-                    url: 'http://webot.tjaja.com/static/subscribe.jpg',
+                    pic: 'http://webot.yemanman.cn/static/subscribe.jpg',
+                    url: 'http://webot.yemanman.cn/static/subscribe.jpg',
                     description: [
                         'hi，我是牛小二，感谢您收听放牛娃亲子圈，目前公众号正在开发中……',
                     ].join('\n')
@@ -71,7 +71,13 @@ const webotSet = function(webot, poster) {
                 },
                 handler: function(info, next) {
                     if(info.param.recognition){
-                        return next(null, info.param.recognition);
+
+                        API.semantic(info.uid, info.param.recognition).then(result => {
+                            return next(null, JSON.stringify(result));
+                        }).catch(err => {
+                            return next(null, JSON.stringify(err));
+                        })
+                        
                     }else{
                         return next(null, "哟，别害羞嘛！想说什么大声说出来！");
                     }
